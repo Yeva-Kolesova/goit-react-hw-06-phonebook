@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { nanoid } from 'nanoid';
 
-const ContactForm = ({ onAddContact }) => {
+const ContactForm = ({ createContact }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
+  const handleChange = ({ target }) => {
+    if ([target.name][0] === 'name') {
+      setName(target.value);
+    }
+    if ([target.name][0] === 'number') {
+      setNumber(target.value);
+    }
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
-    onAddContact({ id: nanoid(), name, number });
+    createContact({ name, number });
     setName('');
     setNumber('');
   };
@@ -24,18 +34,21 @@ const ContactForm = ({ onAddContact }) => {
     >
       <input
         type="text"
+        id="name"
         name="name"
         value={name}
-        onChange={e => setName(e.target.value)}
+        onChange={handleChange}
         required
       />
       <input
+        id="tel"
         type="tel"
         name="number"
         value={number}
-        onChange={e => setNumber(e.target.value)}
+        onChange={handleChange}
         required
       />
+
       <button type="submit">Add contact</button>
     </form>
   );

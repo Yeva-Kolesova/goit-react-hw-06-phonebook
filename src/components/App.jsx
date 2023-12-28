@@ -1,56 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import ContactForm from './ContactForm';
-import ContactList from './ContactList';
-import Filter from './Filter';
+import ContactForm from './ContactForm/ContactForm';
+import ContactList from './Contacts/Contacts';
+import Filter from './Filter/Filter';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  createContactAction,
+  deleteContactAction,
+  setFilterAction,
+} from '../store/contactsSlice';
 
-const App = () => {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
+export const App = () => {
+  const contacts = useSelector(state => state.contacts.contacts);
+  const filter = useSelector(state => state.contacts.filter);
 
-  useEffect(() => {
-    const storedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (storedContacts) {
-      setContacts(storedContacts);
-    }
-  }, []);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const handleAddContact = newContact => {
-    if (
-      contacts.some(
-        contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
-      )
-    ) {
-      alert(`${newContact.name} is already in contacts.`);
-      return;
-    }
-    setContacts(prevContacts => [...prevContacts, newContact]);
-  };
-
-  const handleDeleteContact = id => {
-    setContacts(prevContacts =>
-      prevContacts.filter(contact => contact.id !== id)
+  const createContact = contact => {
+    const isName = contacts.find(
+      item => item.name.toLowerCase() === contact.name.toLowerCase()
     );
+    if (!isName) {
+      dispatch(createContactAction(contact));
+    } else {
+      alert(`${contact.name} is already in contacts`);
+    }
   };
 
-  const getFilteredContacts = () => {
-    return contacts.filter(contact =>
+  const handleDeleteContact = contactId => {
+    dispatch(deleteContactAction(contactId));
+  };
+
+  const handleSetFilter = e => {
+    dispatch(setFilterAction(e.target.value));
+  };
+
+  const getFilteredContacts = () =>
+    contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
-  };
+
+  const filteredContacts = getFilteredContacts();
 
   return (
     <div>
       <h1>Phonebook</h1>
-      <ContactForm onAddContact={handleAddContact} />
+      <ContactForm createContact={createContact} />
 
       <h2>Contacts</h2>
-      <Filter value={filter} onChange={e => setFilter(e.target.value)} />
+      <Filter onChange={handleSetFilter} value={filter} />
       <ContactList
-        contacts={getFilteredContacts()}
+        contacts={filteredContacts}
         onDeleteContact={handleDeleteContact}
       />
     </div>
