@@ -7,10 +7,11 @@ import {
   deleteContactAction,
   setFilterAction,
 } from '../store/contactsSlice';
+import { selectContacts, selectFilter } from 'store/selector';
 
 export const App = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
-  const filter = useSelector(state => state.contacts.filter);
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector(selectFilter);
 
   const dispatch = useDispatch();
 
